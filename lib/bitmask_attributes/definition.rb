@@ -1,10 +1,15 @@
 module BitmaskAttributes
   class Definition
-    attr_reader :attribute, :values, :allow_null, :zero_value, :extension
+    attr_reader :attribute, :values, :allow_null, :zero_value, :extension, :manual_mapping
 
     def initialize(attribute, values=[], allow_null = true, zero_value = nil, &extension)
       @attribute = attribute
-      @values = values
+      if values.kind_of?(Hash)
+        @manual_mapping = values
+        @values = values.keys
+      else
+        @values = values
+      end
       @extension = extension
       @allow_null = allow_null
       @zero_value = zero_value
@@ -44,8 +49,12 @@ module BitmaskAttributes
 
       def generate_bitmasks_on(model)
         model.bitmasks[attribute] = HashWithIndifferentAccess.new.tap do |mapping|
-          values.each_with_index do |value, index|
-            mapping[value] = 0b1 << index
+          if manual_mapping
+            mapping.update manual_mapping
+          else
+            values.each_with_index do |value, index|
+              mapping[value] = 0b1 << index
+            end
           end
         end
       end

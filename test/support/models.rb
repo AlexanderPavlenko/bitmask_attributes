@@ -18,6 +18,9 @@ ActiveRecord::Schema.define do
   create_table :default_values do |t|
     t.integer :default_sym, :default_array
   end
+  create_table :custom_definitions do |t|
+    t.integer :legacy_data
+  end
 end
 
 # Pseudo models for testing purposes
@@ -63,4 +66,8 @@ end
 class DefaultValue < ActiveRecord::Base
   bitmask :default_sym, :as => [:x, :y, :z], :default => :y
   bitmask :default_array, :as => [:x, :y, :z], :default => [:y, :z]
+end
+
+class CustomDefinitions < ActiveRecord::Base
+  bitmask :legacy_data, :as => {:x => 0b001, :y => 0b010, :z => 0b100}
 end

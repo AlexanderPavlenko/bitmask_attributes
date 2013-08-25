@@ -6,18 +6,18 @@ module BitmaskAttributes
 
   module ClassMethods
     def bitmask(attribute, options={}, &extension)
-      unless options[:as] && options[:as].kind_of?(Array)
-        raise ArgumentError, "Must provide an Array :as option"
+      unless options[:as] && (options[:as].kind_of?(Array) || options[:as].kind_of?(Hash))
+        raise ArgumentError, "Must provide an Array or Hash :as option"
       end
 
-      if default = options[:default]
+      if (default = options[:default])
         after_initialize do
           send("#{attribute}=", default) unless send("#{attribute}?") || persisted?
         end
       end
 
       bitmask_definitions[attribute] = Definition.new(attribute, 
-                                                      options[:as].to_a, 
+                                                      options[:as],
                                                       options[:null].nil? || options[:null], 
                                                       options[:zero_value], 
                                                       &extension)
